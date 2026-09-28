@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mushaf-Fortschritt</title>
+<meta name="description" content="Zeigt eine Seite des Madani-Mushafs so, wie ein Schüler sie nach einer Lektion lesen kann: bekannte Zeichen schwarz, unbekannte hellgrau.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%2326247B'/%3E%3Ctext x='16' y='23' font-size='20' text-anchor='middle' fill='white' font-family='serif'%3E%D9%82%3C/text%3E%3C/svg%3E">
+<link rel="preload" href="fonts/UthmanicHafs-v-3.0.ttf" as="fetch" crossorigin>
+<link rel="stylesheet" href="css/uebungen.css">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- Linke Leiste: Lektionen -->
+  <aside class="panel lessons-panel" aria-label="Lektionen">
+    <div class="side-brand" role="banner">
+      <span class="side-logo" aria-hidden="true">ق</span>
+      <span>Mushaf-Fortschritt</span>
+    </div>
+    <div class="lesson-picker">
+      <span class="side-head">Lektion</span>
+      <div class="stepper" role="group" aria-label="Lektion wählen">
+        <button class="icon-btn" id="lessonPrev" aria-label="Vorige Lektion"><svg viewBox="0 0 24 24"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></button>
+        <input type="range" id="lessonRange" min="1" max="60" value="1" aria-label="Lektion">
+        <button class="icon-btn" id="lessonNext" aria-label="Nächste Lektion"><svg viewBox="0 0 24 24"><path d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></button>
+      </div>
+    </div>
+    <div class="side-list" id="lessonList" role="listbox" aria-label="Lektionen 1 bis 60"></div>
+  </aside>
+
+  <!-- Mitte: Mushaf-Seite -->
+  <main class="stage">
+    <header class="stage-top">
+      <div class="stage-title">
+        <h1 id="pageTitle">Seite –</h1>
+        <p class="muted" id="pageSub">&nbsp;</p>
+      </div>
+      <div class="stage-nav" role="group" aria-label="Seite blättern">
+        <button class="btn secondary compact" id="pageNext" aria-label="Nächste Seite (links)"><svg viewBox="0 0 24 24"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>Seite <span id="pageNextNo"></span></button>
+        <button class="btn secondary compact" id="pagePrev" aria-label="Vorige Seite (rechts)">Seite <span id="pagePrevNo"></span><svg viewBox="0 0 24 24"><path d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></button>
+      </div>
+    </header>
+    <div class="known-bar card" aria-live="polite">
+      <div class="known-text"><span class="label">Lektion <span id="lessonNo">1</span></span><span id="knownText" class="known-pct"></span></div>
+      <div class="progress-bar" aria-hidden="true"><span id="knownBar" style="width:0%"></span></div>
+    </div>
+    <div class="page-wrap">
+      <div id="page" class="mushaf-page" aria-busy="true">
+        <div class="loading"><div class="spinner"></div><p class="muted">Schrift und Seitendaten werden geladen …</p></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Rechte Leiste: Stelle, Legende, Downloads -->
+  <aside class="panel settings-panel" aria-label="Einstellungen und Downloads">
+    <section class="card block">
+      <span class="side-head">Stelle</span>
+      <div class="seg" role="tablist">
+        <button class="seg-btn on" id="modeVerse" role="tab" aria-selected="true">Sure &amp; Vers</button>
+        <button class="seg-btn" id="modePage" role="tab" aria-selected="false">Seite</button>
+      </div>
+      <div id="verseFields" class="fields">
+        <label class="setting"><span class="setting-label">Sure</span>
+          <select class="select" id="surahSelect"></select></label>
+        <label class="setting"><span class="setting-label">Vers</span>
+          <input class="num" id="ayahInput" type="number" min="1" value="1" inputmode="numeric"></label>
+        <p class="setting-hint" id="verseHint"></p>
+      </div>
+      <div id="pageFields" class="fields" hidden>
+        <label class="setting"><span class="setting-label">Seite im Madani-Mushaf (1–604)</span>
+          <input class="num" id="pageInput" type="number" min="1" max="604" value="1" inputmode="numeric"></label>
+      </div>
+    </section>
+
+    <section class="card block">
+      <span class="side-head">Legende</span>
+      <div class="legend">
+        <span class="swatch known"></span><span>schon gelernt</span>
+        <span class="swatch unknown"></span><span>noch nicht gelernt</span>
+      </div>
+      <p class="setting-hint">Versende-Zeichen, ۞ und das Sajda-Zeichen gehören zur Seitengestaltung und bleiben immer sichtbar.</p>
+    </section>
+
+    <section class="card block">
+      <span class="side-head">Herunterladen</span>
+      <button class="btn" id="dlAll"><svg viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/></svg>PDF · Lektionen 1–60</button>
+      <p class="setting-hint">Diese Seite 60-mal, jede PDF-Seite eine Lektion (A5).</p>
+      <button class="btn secondary" id="dlPdf">PDF · nur Lektion <span class="cur-lesson">1</span></button>
+      <label class="setting toggle-row"><span class="setting-label">Lektion klein am Seitenrand vermerken</span>
+        <input type="checkbox" class="switch" id="labelToggle" checked></label>
+      <div class="dl-row">
+        <button class="btn secondary compact" id="dlSvg">SVG</button>
+        <button class="btn secondary compact" id="dlPng">PNG</button>
+        <button class="btn secondary compact" id="dlJson">App-JSON</button>
+      </div>
+      <p class="setting-hint"><b>Für App-Entwickler:</b> Das SVG zeigt die Seite 1:1 als Vektorgrafik. Jeder Textpfad trägt <code>data-lesson</code>. Ist der Wert höchstens die gewählte Lektion, wird der Pfad schwarz, sonst grau. So deckt eine Datei alle 60 Lektionen ab. Das App-JSON enthält dieselben Pfade, dazu Wörter, Versangaben und die Lektion je Zeichen.</p>
+      <p class="setting-hint status" id="dlStatus" aria-live="polite"></p>
+    </section>
+
+    <p class="credit">Text und Zeilenumbruch: King Fahd Complex (KFGQPC Uthmanic Script HAFS v3.0, über <a href="https://www.npmjs.com/package/@quran.ws/text">@quran.ws/text</a>). Satz mit <a href="https://github.com/harfbuzz/harfbuzzjs">HarfBuzz</a>. Lehrplan: <code>curriculum.csv</code>.</p>
+  </aside>
+</div>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

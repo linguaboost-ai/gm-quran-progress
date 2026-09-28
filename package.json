@@ -1,0 +1,17 @@
+{
+  "name": "gm-quran-progress",
+  "private": true,
+  "type": "module",
+  "description": "Madani-Mushaf-Seiten mit Lernfortschritt: bekannte Zeichen schwarz, unbekannte hellgrau",
+  "scripts": {
+    "build:data": "node tools/build-data.mjs",
+    "build:ligatures": "python3 tools/build_ligatures.py",
+    "test": "node --test tests/*.test.mjs",
+    "serve": "npx http-server -c-1 -p 8080 ."
+  },
+  "devDependencies": {
+    "@quran.ws/text": "0.1.0",
+    "quran-meta": "7.0.0",
+    "pdf-lib": "1.17.1"
+  }
+}
