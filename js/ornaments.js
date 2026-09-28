@@ -19,7 +19,7 @@ export const TEXT = {
 };
 
 export const PALETTE = {
-  paper: "#FAFAFA", // Seitenrand außerhalb des Rahmens
+  paper: "#FFFFFF", // Seitenrand außerhalb des Rahmens
   textBg: "#F0FAFF", // Hintergrund der Schrift
   cream: "#F0FAFF",
   blueDark: "#173F7D",
