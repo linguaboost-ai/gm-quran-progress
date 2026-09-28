@@ -125,6 +125,8 @@ export class MushafRenderer {
     const positions = [];
     for (let k = 1; k < bases.length; k++) {
       const p = word[bases[k - 1]], c = word[bases[k]];
+      // nie zwischen ل und Alif dehnen: das zerstört die Lām-Alif-Ligatur (لا)
+      if (p === "ل" && "اأإآٱ".includes(c)) continue;
       if (joinsLeft(p) && joinsRight(c)) positions.push(bases[k]);
     }
     positions.reverse();
