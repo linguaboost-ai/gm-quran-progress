@@ -19,8 +19,9 @@ export const TEXT = {
 };
 
 export const PALETTE = {
-  paper: "#FFFCF1",
-  cream: "#FFF8E6",
+  paper: "#FAFAFA", // Seitenrand außerhalb des Rahmens
+  textBg: "#F0FAFF", // Hintergrund der Schrift
+  cream: "#F0FAFF",
   blueDark: "#173F7D",
   blue: "#2F68B2",
   blueMid: "#7FA6D6",
@@ -261,7 +262,7 @@ function specialFrame(prims, { ix0, iy0, ix1, iy1 }) {
   prims.push({ d: beads, fill: P.goldLight });
   prims.push({ d: ellipsePath(cx, cy, rx + 16, ry + 16), stroke: P.gold, sw: 1.6 });
   prims.push({ d: ellipsePath(cx, cy, rx, ry), stroke: P.gold, sw: 1.6 });
-  prims.push({ d: ellipsePath(cx, cy, rx - 3, ry - 3), fill: P.paper });
+  prims.push({ d: ellipsePath(cx, cy, rx - 3, ry - 3), fill: P.textBg });
 }
 
 // ---------------------------------------------------------------- Seitenteile
@@ -413,6 +414,7 @@ function surahBanner(meta, surah, y0, pitch, text, opts = {}) {
 export function pageDecor(page, meta, { text }) {
   const prims = [];
   prims.push({ d: rectPath(0, 0, PAGE_W, PAGE_H), fill: PALETTE.paper });
+  prims.push({ d: rectPath(FRAME.x0, FRAME.y0, FRAME.x1 - FRAME.x0, FRAME.y1 - FRAME.y0), fill: PALETTE.textBg });
   frame(prims, { special: page.page <= 2 });
   header(page, meta, text);
   pageNumber(page.page, prims, text);
