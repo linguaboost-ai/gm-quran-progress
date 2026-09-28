@@ -9,7 +9,7 @@ import { buildPdf, buildAppJson } from "./export.js";
 const $ = (id) => document.getElementById(id);
 const pad3 = (n) => String(n).padStart(3, "0");
 
-const state = { page: 1, lesson: 1, mode: "verse", surah: 1, ayah: 1 };
+const state = { wholeWords: false, page: 1, lesson: 1, mode: "verse", surah: 1, ayah: 1 };
 let renderer, meta, lessons;
 const models = new Map();
 
@@ -27,10 +27,11 @@ async function loadAll() {
 }
 
 async function getModel(page) {
-  if (models.has(page)) return models.get(page);
+  const key = `${page}:${state.wholeWords ? "w" : "z"}`;
+  if (models.has(key)) return models.get(key);
   const data = await fetch(`data/pages/${pad3(page)}.json`).then((r) => r.json());
-  const model = renderer.buildPage(data, meta);
-  models.set(page, model);
+  const model = renderer.buildPage(data, meta, { wholeWords: state.wholeWords });
+  models.set(key, model);
   if (models.size > 12) models.delete(models.keys().next().value);
   return model;
 }
@@ -315,6 +316,10 @@ async function main() {
     if (e.key === "ArrowRight") setPage(state.page - 1);
     if (e.key === "ArrowUp" || e.key === "+") { e.preventDefault(); setLesson(state.lesson + 1); }
     if (e.key === "ArrowDown" || e.key === "-") { e.preventDefault(); setLesson(state.lesson - 1); }
+  });
+  $("wholeWordsToggle").addEventListener("change", (e) => {
+    state.wholeWords = e.target.checked;
+    showPage();
   });
   window.addEventListener("hashchange", () => {
     const before = state.page;
