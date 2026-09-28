@@ -9,7 +9,7 @@ import { buildPdf, buildAppJson } from "./export.js";
 const $ = (id) => document.getElementById(id);
 const pad3 = (n) => String(n).padStart(3, "0");
 
-const state = { wholeWords: false, page: 1, lesson: 1, mode: "verse", surah: 1, ayah: 1 };
+const state = { unit: "char", page: 1, lesson: 1, mode: "verse", surah: 1, ayah: 1 };
 let renderer, meta, lessons;
 const models = new Map();
 
@@ -27,10 +27,10 @@ async function loadAll() {
 }
 
 async function getModel(page) {
-  const key = `${page}:${state.wholeWords ? "w" : "z"}`;
+  const key = `${page}:${state.unit}`;
   if (models.has(key)) return models.get(key);
   const data = await fetch(`data/pages/${pad3(page)}.json`).then((r) => r.json());
-  const model = renderer.buildPage(data, meta, { wholeWords: state.wholeWords });
+  const model = renderer.buildPage(data, meta, { unit: state.unit });
   models.set(key, model);
   if (models.size > 12) models.delete(models.keys().next().value);
   return model;
@@ -317,10 +317,13 @@ async function main() {
     if (e.key === "ArrowUp" || e.key === "+") { e.preventDefault(); setLesson(state.lesson + 1); }
     if (e.key === "ArrowDown" || e.key === "-") { e.preventDefault(); setLesson(state.lesson - 1); }
   });
-  $("wholeWordsToggle").addEventListener("change", (e) => {
-    state.wholeWords = e.target.checked;
-    showPage();
-  });
+  for (const [id, unit, other] of [["wholeWordsToggle", "word", "wholeVersesToggle"], ["wholeVersesToggle", "verse", "wholeWordsToggle"]]) {
+    $(id).addEventListener("change", (e) => {
+      if (e.target.checked) $(other).checked = false;
+      state.unit = e.target.checked ? unit : "char";
+      showPage();
+    });
+  }
   window.addEventListener("hashchange", () => {
     const before = state.page;
     readHash();

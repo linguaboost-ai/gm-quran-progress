@@ -352,16 +352,24 @@ export class MushafRenderer {
    * Seitenmodell für eine Seite (Format data/pages/NNN.json).
    * @returns {{page:number, atoms:{l:number,d:string,clip?:number[]}[], decor:object[]}}
    */
-  buildPage(page, meta, { wholeWords = false } = {}) {
+  buildPage(page, meta, { unit = "char" } = {}) {
     annotatePage(page);
-    // „Nur ganze Wörter“: ein Wort ist erst bekannt, wenn alle seine Zeichen bekannt sind
-    if (wholeWords) {
-      for (const line of page.lines) {
+    // „Ganze Wörter“ / „Ganze Verse“: eine Einheit ist erst bekannt, wenn alle
+    // ihre Zeichen bekannt sind (Verse enden im Madani-Mushaf nie über eine Seite hinaus)
+    if (unit !== "char") {
+      const groups = new Map();
+      let basmala = 0;
+      page.lines.forEach((line, li) => {
         for (const t of line.tokens || []) {
           if (!t.w || !t.lessons) continue;
-          const max = Math.max(...t.lessons);
-          t.lessons = t.lessons.map((l) => (l === NEUTRAL ? l : max));
+          const key = unit === "word" ? t : line.type === "basmala" ? "b" + li : t.k ? t.k.split(":").slice(0, 2).join(":") : "x" + basmala++;
+          if (!groups.has(key)) groups.set(key, []);
+          groups.get(key).push(t);
         }
+      });
+      for (const toks of groups.values()) {
+        const max = Math.max(...toks.flatMap((t) => t.lessons));
+        for (const t of toks) t.lessons = t.lessons.map((l) => (l === NEUTRAL ? l : max));
       }
     }
     const atoms = [];
