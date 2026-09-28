@@ -31,9 +31,7 @@ body {
 .settings-panel { grid-area: settings; border-left: 1px solid var(--line); }
 .stage { grid-area: stage; display: flex; flex-direction: column; gap: 12px; padding: 20px 28px 28px; min-width: 0; }
 
-.side-brand { cursor: default; margin: 0; padding: 0; }
-.side-brand:hover { background: none; }
-.side-brand:hover .side-logo { background: var(--primary); }
+.side-brand { margin: 0; padding: 6px 8px; margin: -6px -8px; text-decoration: none; width: auto; }
 .side-logo { font-family: var(--ar); }
 
 /* Lektionen */
